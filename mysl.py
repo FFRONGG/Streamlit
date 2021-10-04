@@ -20,33 +20,29 @@ import pandas as pd
 import numpy as np
 import altair as alt
 import pydeck as pdk
+from PIL import Image
 
 # SETTING PAGE CONFIG TO WIDE MODE
 st.set_page_config(layout="wide")
-st.title("By Chirawat Kochabog 6130828021")
+image = Image.open('/content/drive/MyDrive/5120x3200_night-city-road-traffic-light-minneapolis.jpg')
+st.image(image,use_column_width=True)
+st.title(":bar_chart: WEB MAP CREATED FROM STREAMLIT")
+st.text("By Chirawat Kochabog 6130828021")
+
 ##################################################################################
 ###########################################################################################
 
 # LAYING OUT THE TOP SECTION OF THE APP
 row1_1, row1_2 = st.columns(2)
 
+
 with row1_1:
-    date_select = st.selectbox("Date Selection",("Jan. 1, 2019", "Jan. 2, 2019","Jan. 3, 2019","Jan. 4, 2019","Jan. 5, 2019"))
-    hour_selected = st.slider("Select hour of travelling", 0, 23)
+    st.header('เลือกวันและเวลาที่สนใจ')
+    st.write("เลือกวันที่ที่ต้องการทราบข้อมูลการเดินทางและเลือกเวลาที่ท่านสนใจ")
 
 with row1_2:
-    st.write(
-    """
-    ##
-    Examining the number of travelling started and destinations reached for Bangkok and areas nearby.
-    By sliding the slider on the left and selecting date you can view different slices of date and time and explore different transportation trends.
-
-    This website was made by Siraphop Thanyapisetsak Student NO. 6130828021
-    """)
-
-
-timedisplay = "Date Displayed : " + date_select
-st.title(timedisplay)
+    date_select = st.selectbox("เลือกวันที่",("Jan. 1, 2019", "Jan. 2, 2019","Jan. 3, 2019","Jan. 4, 2019","Jan. 5, 2019"))
+    hour_selected = st.slider("เลือกจำนวนชั่วโมงการเดินทาง", 0, 23)
 
 
 # LOADING DATA
@@ -116,7 +112,7 @@ data = data[(data[DATE_TIME].dt.hour == hour_selected) & (data[DATE_TIME].dt.yea
 
 
 # LAYING OUT THE MIDDLE SECTION OF THE APP WITH THE MAPS
-row2_1, row2_2 = st.columns(2)
+
 
 # SETTING THE ZOOM LOCATIONS FOR THE AIRPORTS
 zoom_level = 11
@@ -124,8 +120,8 @@ zoom_level = 11
 #midpoint2 = (np.average(data2["lat"]), np.average(data2["lon"]))
 midpoint = [13.736717, 100.523186]
 
-st.write("**All travelling started during %i:00 - %i:00**" % (hour_selected, (hour_selected + 1) % 24))
 map(data, midpoint[0], midpoint[1], zoom_level)
+st.write("***แผนภูมิแสดงปริมาณการใช้รถบนถนน ณ ชั่วเวลานั้น")
 
 
 # FILTERING DATA FOR THE HISTOGRAM
@@ -139,17 +135,15 @@ chart_data = pd.DataFrame({"minute": range(60), "travelling started": hist})
 
 # LAYING OUT THE HISTOGRAM SECTION
 st.write("")
-
-st.write("**Breakdown of all travelling started per minute between %i:00 and %i:00**" % (hour_selected, (hour_selected + 1) % 24))
-
 st.altair_chart(alt.Chart(chart_data)
-    .mark_area(
-        interpolate='step-after',
-    ).encode(
-        x=alt.X("minute:Q", scale=alt.Scale(nice=False)),
-        y=alt.Y("travelling started:Q"),
-        tooltip=['minute', 'travelling started']
-    ).configure_mark(
-        opacity=0.5,
-        color='red'
-    ), use_container_width=True)
+          .mark_area(
+              interpolate='step-after',
+          ).encode(
+              x=alt.X("minute:Q", scale=alt.Scale(nice=False)),
+              y=alt.Y("travelling started:Q"),
+              tooltip=['minute', 'travelling started']
+          ).configure_mark(
+              opacity=0.5,
+              color='red'
+          ), use_container_width=True)
+st.write("***กราฟHistogram แสดงปริมาณรถบนถนนในแต่ละช่วงเวลา" )
